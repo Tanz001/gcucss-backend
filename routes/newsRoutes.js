@@ -21,3 +21,4 @@ router.delete('/:id', authenticate, deleteNews);
 
 module.exports = router;
 
+
