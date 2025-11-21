@@ -18,25 +18,23 @@ categories.forEach(category => {
 });
 
 // Storage configuration
+const resolveCategory = (req, file) => {
+  const pathHint = `${req.baseUrl || ''}${req.path || ''}`.toLowerCase();
+
+  if (pathHint.includes('events')) return 'events';
+  if (pathHint.includes('news')) return 'news';
+  if (pathHint.includes('announcement')) return 'announcements';
+  if (pathHint.includes('team')) return 'team';
+  if (file.fieldname === 'receipt') return 'receipts';
+  if (pathHint.includes('membership')) return 'membership';
+
+  return 'membership';
+};
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    let uploadPath = assetsDir;
-    
-    // Determine folder based on route or field name
-    if (req.route?.path?.includes('event')) {
-      uploadPath = path.join(assetsDir, 'events');
-    } else if (req.route?.path?.includes('news')) {
-      uploadPath = path.join(assetsDir, 'news');
-    } else if (req.route?.path?.includes('announcement')) {
-      uploadPath = path.join(assetsDir, 'announcements');
-    } else if (req.route?.path?.includes('team')) {
-      uploadPath = path.join(assetsDir, 'team');
-    } else if (file.fieldname === 'receipt') {
-      uploadPath = path.join(assetsDir, 'receipts');
-    } else {
-      uploadPath = path.join(assetsDir, 'membership');
-    }
-    
+    const category = resolveCategory(req, file);
+    const uploadPath = path.join(assetsDir, category);
     cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
